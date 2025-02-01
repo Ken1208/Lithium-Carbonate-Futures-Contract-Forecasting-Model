@@ -44,6 +44,22 @@ for (contract in contracts) {
   contract_data <- data %>% filter(合约代码 == contract)
   contract_data <- contract_data %>% arrange(交易日期)
   
+  # Add cyclical data
+  contract_data <- contract_data %>%
+    mutate(
+      Month = month(交易日期),                  
+      Quarter = quarter(交易日期)                
+    )
+  
+  # Add lag features: 7-day and 15-day averages
+  for (col in lag_columns) {
+    contract_data <- contract_data %>%
+      mutate(
+        !!paste0("7-day avg ", col) := rollmean(.data[[col]], 7, fill = NA, align = "right"), # 7-day
+        !!paste0("15-day avg ", col) := rollmean(.data[[col]], 15, fill = NA, align = "right") # 15-day
+      )
+  }
+  
   # Add features for the next day's prices and directions
   contract_data <- contract_data %>%
     mutate(
