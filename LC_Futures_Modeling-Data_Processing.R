@@ -39,3 +39,27 @@ head(data)
 
 library(tidyr)
 data <- data %>% drop_na()
+
+for (contract in contracts) {
+  contract_data <- data %>% filter(合约代码 == contract)
+  contract_data <- contract_data %>% arrange(交易日期)
+  
+  # Add features for the next day's prices and directions
+  contract_data <- contract_data %>%
+    mutate(
+      Next_Day_Closing_Price = lead(收盘价, 1),
+      Next_Day_Opening_Price = lead(开盘价, 1),
+      Next_Day_Highest_Price = lead(最高价, 1),
+      Next_Day_Lowest_Price = lead(最低价, 1),
+      Next_Day_Settlement_Price = lead(结算价, 1),
+      Price_Up_or_Down = ifelse(涨跌 > 0, "Up", "Down"),   # 1 if 涨跌 > 0, otherwise 0
+      Price_Up_or_Down1 = ifelse(涨跌1 > 0, "Up", "Down"),  # 1 if 涨跌1 > 0, otherwise 0
+      Next_Day_Price_Up_or_Down = lead(Price_Up_or_Down, 1),
+      Next_Day_Price_Up_or_Down1 = lead(Price_Up_or_Down1, 1),
+      Next_Day_Price_Up_or_Down_Num = ifelse(Next_Day_Price_Up_or_Down == "Up", 1, 0)
+    )
+  
+  
+  contract_datasets[[contract]] <- contract_data
+}
+
