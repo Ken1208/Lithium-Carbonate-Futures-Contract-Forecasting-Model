@@ -44,6 +44,15 @@ for (contract in contracts) {
   contract_data <- data %>% filter(合约代码 == contract)
   contract_data <- contract_data %>% arrange(交易日期)
   
+  # Add EMA-related features (7-day and 15-day EMA)
+  for (col in c("开盘价", "收盘价", "成交量", "持仓量")) { # Select key columns to calculate EMA
+    contract_data <- contract_data %>%
+      mutate(
+        !!paste0("7-day EMA_", col) := EMA(.data[[col]], n = 7),
+        !!paste0("15-day EMA_", col) := EMA(.data[[col]], n = 15)
+      )
+  }
+  
   # Add cyclical data
   contract_data <- contract_data %>%
     mutate(
