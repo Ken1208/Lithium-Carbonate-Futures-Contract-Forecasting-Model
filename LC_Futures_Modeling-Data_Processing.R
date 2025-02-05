@@ -62,6 +62,15 @@ for (contract in contracts) {
       )
   }
   
+  # Calculate ZLEMA (Zero Lag Exponential Moving Average)
+  for (col in c("开盘价", "收盘价", "成交量", "持仓量")) { # Select key columns to calculate ZLEMA
+    contract_data <- contract_data %>%
+      mutate(
+        !!paste0("7-day ZLEMA_", col) := ZLEMA(.data[[col]], n = 7),
+        !!paste0("15-day ZLEMA_", col) := ZLEMA(.data[[col]], n = 15)
+      )
+  }
+  
   # Add cyclical data
   contract_data <- contract_data %>%
     mutate(
