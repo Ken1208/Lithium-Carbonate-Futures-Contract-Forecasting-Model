@@ -53,6 +53,15 @@ for (contract in contracts) {
       )
   }
   
+  # Calculate DEMA
+  for (col in c("开盘价", "收盘价", "成交量", "持仓量")) { # Select key columns to calculate DEMA
+    contract_data <- contract_data %>%
+      mutate(
+        !!paste0("7-day DEMA_", col) := DEMA(.data[[col]], n = 7),
+        !!paste0("15-day DEMA_", col) := DEMA(.data[[col]], n = 15)
+      )
+  }
+  
   # Add cyclical data
   contract_data <- contract_data %>%
     mutate(
