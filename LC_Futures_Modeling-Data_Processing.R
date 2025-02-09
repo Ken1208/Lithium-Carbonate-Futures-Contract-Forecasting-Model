@@ -71,6 +71,20 @@ for (contract in contracts) {
       )
   }
   
+  # Calculate ALMA
+  alma <- function(price, n = 9, sigma = 6, offset = 0.85) {
+    m <- offset * (n - 1)
+    s <- n / sigma
+    weights <- exp(-((seq(0, n - 1) - m)^2) / (2 * s^2))
+    weights <- weights / sum(weights)
+    rollapply(price, width = n, FUN = function(x) sum(weights * x), fill = NA, align = "right")
+  }
+  
+  contract_data <- contract_data %>%
+    mutate(
+      ALMA_收盘价 = alma(收盘价, n = 9, sigma = 6, offset = 0.85)
+    )
+  
   # Add cyclical data
   contract_data <- contract_data %>%
     mutate(
