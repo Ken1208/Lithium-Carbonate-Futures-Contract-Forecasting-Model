@@ -85,6 +85,18 @@ for (contract in contracts) {
       ALMA_收盘价 = alma(收盘价, n = 9, sigma = 6, offset = 0.85)
     )
   
+  # Calculate MACD
+  macd_result <- MACD(contract_data$收盘价, 
+                      nFast = 12, nSlow = 26, nSig = 9, 
+                      maType = "EMA", percent = FALSE)
+  # Add MACD results to the data frame
+  contract_data <- contract_data %>%
+    mutate(
+      MACD = macd_result[, "macd"],       # MACD line
+      Signal_Line = macd_result[, "signal"], # Signal line
+      MACD_Histogram = MACD - Signal_Line  # Histogram
+    )
+  
   # Add cyclical data
   contract_data <- contract_data %>%
     mutate(
